@@ -83,6 +83,7 @@ export let CORE_URL = null;
 export let SECURITY_URL = null;
 export let channelId = null;
 export let profileDateFields = null;
+export let MASTER_URL = null;
 
 export const getConfig = () => {
     if (!config) {
@@ -96,6 +97,7 @@ export const loadConfig = async () => {
     CORE_URL = config.CORE_URL; 
     SECURITY_URL = config.SECURITY_URL;
     channelId = config.channelId;
-    profileDateFields = config.profileDateFields
+    profileDateFields = config.profileDateFields,
+    MASTER_URL = config.MASTER_URL
     
 }

@@ -32,12 +32,10 @@ import FileCopyIcon from "@mui/icons-material/FileCopy";
 import ProfileHistoryTable2 from './ProfileHistoryTable2';
 import Autocomplete1 from '../../../../components/AutoComplete/AutoComplete1';
 import { MDBCardBody, MDBCol, MDBRow } from 'mdb-react-ui-kit';
-import AutoComplete2 from '../../../../components/AutoComplete/AutoComplete2';
-import { CustomScroll } from 'react-custom-scroll';
-import SearchBox from '../../../../components/SearchBox/SearchBox';
-import RoleSelect1 from '../../../../components/Select/RoleSelect1';
 import SecurityInput from '../../../../components/Inputs/SecurityInput';
 import { useTheme } from '../../../../config/themeContext';
+import AutoCompleteProfile from '../../../../components/AutoComplete/AutoCompleteProfile';
+import { profileApis } from '../../../../apis/ProfileApis/profileApis';
 
 const SelectAllIconStyle ={//style for selectAll and unselectAll
   fontSize: "0.8rem",
@@ -335,6 +333,9 @@ const ProfileNew = ({setPage,detailPageId}) => {
   const [selectedRow, setSelectedRow] = useState(null);
   const [select, setSelect] = React.useState([]);
   const [selectedOption, setSelectedOption] = React.useState('');
+  const [formData, setFormData] = useState({});
+
+  const {getbusinessentitylist} = profileApis()
 
   const { currentTheme } = useTheme();
   const buttonStyle ={
@@ -464,13 +465,22 @@ const ProfileNew = ({setPage,detailPageId}) => {
                     <AccountInput label="Profile Name" mandatory="1" />
                   </MDBCol>
                   <MDBCol lg="3" md="4" sm="6" xs="12">
-                  <RoleSelect1
+                  {/* <RoleSelect1
                     label="Business Entity"
                     value={selectedOption}
                     onChange={handleSelectChange}
                     options={entityList}
                     mandatory={1}
-                  />
+                  /> */}
+                  <AutoCompleteProfile
+                      formData={formData}
+                      setFormData={setFormData}
+                      autoId={`BusinessEntity`}
+                      label={"Business Entity"}
+                      apiKey={getbusinessentitylist}
+                      formDataName={"sEmp"}
+                      formDataiId={"iEmployee"}
+                    />
                   </MDBCol>
                   <MDBCol lg="3" md="4" sm="6" xs="12">
                       <SecurityInput label="Remarks" multiline={true}/>

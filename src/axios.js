@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { CORE_URL, SECURITY_URL, loadConfig } from './config.js';
+import { CORE_URL, SECURITY_URL,MASTER_URL, loadConfig } from './config.js';
 
 const coreApi = axios.create({
   headers: {
@@ -8,6 +8,11 @@ const coreApi = axios.create({
 });
 
 const securityApi = axios.create({
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+const masterApi = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
@@ -22,10 +27,15 @@ export const updateSecurityApiBaseUrl = (newBaseUrl) => {
   securityApi.defaults.baseURL = newBaseUrl;
 };
 
+export const updateMasterApiBaseUrl = (newBaseUrl) => {
+  masterApi.defaults.baseURL = newBaseUrl;
+};
+
 // Use these functions after your config has been loaded
 loadConfig().then(() => {
   updateCoreApiBaseUrl(CORE_URL);
   updateSecurityApiBaseUrl(SECURITY_URL);
+  updateMasterApiBaseUrl(MASTER_URL)
 });
 
-export { coreApi, securityApi };
+export { coreApi, securityApi,masterApi };
