@@ -82,6 +82,7 @@ export let config = null;
 export let CORE_URL = null;
 export let SECURITY_URL = null;
 export let channelId = null;
+export let profileDateFields = null;
 
 export const getConfig = () => {
     if (!config) {
@@ -94,6 +95,7 @@ export const loadConfig = async () => {
     config = await response.json();
     CORE_URL = config.CORE_URL; 
     SECURITY_URL = config.SECURITY_URL;
-    channelId = config.channelId
+    channelId = config.channelId;
+    profileDateFields = config.profileDateFields
     
 }

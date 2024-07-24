@@ -6,9 +6,7 @@ import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
-import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
-import TableSortLabel from "@mui/material/TableSortLabel";
 import Paper from "@mui/material/Paper";
 import {
   FormControl,
@@ -16,17 +14,13 @@ import {
   MenuItem,
   Select,
   IconButton,
-  Checkbox,
   Typography,
-  Tooltip,
   TextField,
 } from "@mui/material";
 import FirstPageIcon from "@mui/icons-material/FirstPage";
 import LastPageIcon from "@mui/icons-material/LastPage";
-
-
-
-
+import { profileDateFields } from "../../config";
+import Pagination from "@mui/material/Pagination";
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -56,65 +50,29 @@ function stableSort(array, comparator) {
   return stabilizedThis.map((el) => el[0]);
 }
 
-
 function EnhancedTableHead(props) {
-   const {
-    onSelectAllClick,
-    order,
-    orderBy,
-    numSelected,
-    rowCount,
-    onRequestSort,
-    headCells,
-    columnOrder
-  } = props;
-
-  const createSortHandler = (property) => (event) => {
-    onRequestSort(event, property);
-  };
+  const { onRequestSort, headCells } = props;
 
   return (
     <TableHead>
       <TableRow>
-      
-          {/* <TableCell
-            sx={{
-              padding: "0px",
-              backgroundColor: thirdColor,
-              color: "white",
-              textAlign:"center"
-            }}
-          >
-           
-          </TableCell> */}
-        
-       {headCells.map((headCell) => (
+        {headCells.map((headCell) => (
           <TableCell
             key={headCell.id}
             align={"left"}
-            //sortDirection={orderBy === headCell.id ? order : false}
             sx={{
               padding: "0px",
-              paddingLeft:"4px",
+              paddingLeft: "4px",
               border: " 1px solid #ddd",
               fontWeight: "600",
               font: "14px",
               backgroundColor: currentTheme.thirdColor,
-              color: currentTheme.tableHeaderColor,paddingTop:"3px",paddingBottom:"3px"
+              color: currentTheme.tableHeaderColor,
+              paddingTop: "3px",
+              paddingBottom: "3px",
             }}
           >
-            {/* <TableSortLabel
-              active={orderBy === headCell.id}
-              direction={orderBy === headCell.id ? order : "asc"}
-              onClick={createSortHandler(headCell.id)}
-            > */}
             {headCell.label}
-            {/* {orderBy === headCell.id ? (
-                <Box component="span" sx={visuallyHidden}>
-                  {order === "desc" ? "sorted descending" : "sorted ascending"}
-                </Box>
-              ) : null}
-            </TableSortLabel> */}
           </TableCell>
         ))}
       </TableRow>
@@ -129,18 +87,10 @@ EnhancedTableHead.propTypes = {
   order: PropTypes.oneOf(["asc", "desc"]).isRequired,
   orderBy: PropTypes.string.isRequired,
   rowCount: PropTypes.number.isRequired,
-  
 };
 
-// const initialColumns = [
-//   { id: 'profileName', label: 'Profile Name', minWidth: 200 },
-//   { id: 'createdOn', label: 'Created On', minWidth: 100 },
-//   { id: 'modifiedOn', label: 'Modified On', minWidth: 100 },
-//   { id: 'test1', label: 'test1', minWidth: 200 },
-//   { id: 'test2', label: 'test2', minWidth: 150 }
-// ];
 export default function TableSecurity(props) {
-  const { rows,totalRows,currentTheme} = props;
+  const { rows, totalRows, currentTheme, loading, totalPages } = props;
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("");
   const [selected, setSelected] = React.useState([]);
@@ -154,16 +104,26 @@ export default function TableSecurity(props) {
 
   const excludedFields = ["IId"];
 
-  const initialColumns = rows && rows.length > 0 ? Object.keys(rows[0]).filter((key) => !excludedFields.includes(key)).map(key => ({
-    id: key,
-    label: key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1').trim(),  // Format label as readable text
-    minWidth: 100,  // Set default minWidth for all columns
-    maxWidth: 200
-  })) : [];
+  const initialColumns =
+    rows && rows.length > 0
+      ? Object.keys(rows[0])
+          .filter((key) => !excludedFields.includes(key))
+          .map((key) => ({
+            id: key,
+            label:
+              key.charAt(0).toUpperCase() +
+              key
+                .slice(1)
+                .replace(/([A-Z])/g, " $1")
+                .trim(), // Format label as readable text
+            minWidth: 100, // Set default minWidth for all columns
+            maxWidth: 200,
+          }))
+      : [];
   React.useEffect(() => {
-    setColumns(initialColumns)
-  }, [rows])
-  
+    setColumns(initialColumns);
+  }, [rows]);
+
   const handleResize = (index, event) => {
     const startWidth = columns[index].minWidth;
     const startX = event.clientX;
@@ -173,18 +133,18 @@ export default function TableSecurity(props) {
       const newWidth = Math.max(50, startWidth + (currentX - startX));
       setColumns((cols) =>
         cols.map((col, i) =>
-          i === index ? { ...col, minWidth: newWidth,maxWidth:newWidth } : col
+          i === index ? { ...col, minWidth: newWidth, maxWidth: newWidth } : col
         )
       );
     };
 
     const handleMouseUp = () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
     };
 
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
   };
 
   const handleDoubleClick = (index) => {
@@ -194,8 +154,6 @@ export default function TableSecurity(props) {
       )
     );
   };
-
-  
 
   const transformData = (rows) => {
     return rows.map((row) => {
@@ -229,43 +187,6 @@ export default function TableSecurity(props) {
     props.onSearchKeyChange(event.target.value);
   };
 
-  const handleRequestSort = (event, property) => {
-    //     const isAsc = orderBy === property && order === "asc";
-    //     const newSortDir = isAsc ? "desc" : "asc";
-    //   // Call the parent callback to handle the sorting change
-    //   props.onSortChange(property, newSortDir);
-  };
-
-  const handleSelectAllClick = (event) => {
-    if (event.target.checked) {
-      const newSelected = visibleRows.map((row) => ({
-        IId: row.IId,
-      }));
-      setSelected(newSelected);
-      return;
-    }
-    setSelected([]);
-  };
-
-  //use if IId only needed
-  // const handleClick = (event, row) => {
-  //   const selectedIndex = selected.findIndex((item) => item.IId === row.IId);
-  //   let newSelected = [];
-
-  //   if (selectedIndex === -1) {
-  //     newSelected = newSelected.concat(selected, {
-  //       IId: row.IId,
-  //     });
-  //   } else {
-  //     newSelected = [
-  //       ...selected.slice(0, selectedIndex),
-  //       ...selected.slice(selectedIndex + 1),
-  //     ];
-  //   }
-
-  //   setSelected(newSelected);
-  // };
-
   const handleClick = (event, row) => {
     const selectedIndex = selected.indexOf(row.IId);
     let newSelected = [];
@@ -283,11 +204,10 @@ export default function TableSecurity(props) {
   };
 
   //remove event if Nan comes in pagination
-  const handleChangePage = (newPage) => {
-    setPage(newPage); // Set the new page number
-    props.onpageNumberChange(newPage + 1); 
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+    props.onpageNumberChange(newPage + 1);
   };
-
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
@@ -308,17 +228,17 @@ export default function TableSecurity(props) {
     [order, orderBy, page, rowsPerPage, filteredRows]
   );
 
-//   const handleRowDoubleClick = (event, row) => {
-//     if (pageTitle === 11) {
-//       // If it matches, return early to disable double-click functionality
-//       return;
-//     }
-//     // Create a new array with just the double-clicked row
-//     const doubleClickedRow = row;
+  //   const handleRowDoubleClick = (event, row) => {
+  //     if (pageTitle === 11) {
+  //       // If it matches, return early to disable double-click functionality
+  //       return;
+  //     }
+  //     // Create a new array with just the double-clicked row
+  //     const doubleClickedRow = row;
 
-//     // Now call the onRowDoubleClick prop with the new array
-//     props.onRowDoubleClick(doubleClickedRow);
-//   };
+  //     // Now call the onRowDoubleClick prop with the new array
+  //     props.onRowDoubleClick(doubleClickedRow);
+  //   };
 
   React.useEffect(() => {
     if (searchTerm) {
@@ -353,14 +273,30 @@ export default function TableSecurity(props) {
     props.onSelectedRowsChange(selected);
   }, [selected]);
 
-  const isTextOverflow = (text, maxWidth) => {
-    const canvas = document.createElement("canvas");
-    const context = canvas.getContext("2d");
-    context.font = "12px Arial"; // Set the same font styles as your TableCell
-    return context.measureText(text).width > maxWidth;
+
+  const convertToLocaleDateString = (dateString) => {
+    if (!dateString) return ""; // Return an empty string for null or undefined values
+    const date = new Date(dateString);
+    if (isNaN(date)) return dateString; // If date is invalid, return the original string
+
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-indexed
+    const year = date.getFullYear();
+
+    return `${day}-${month}-${year}`;
   };
   return (
-    <Box sx={{ width: "95%", margin: "auto", marginTop: "30px" }}>
+    <Box
+      sx={{
+        width: "95%",
+        margin: "auto",
+        marginTop: "30px",
+        boxShadow: 3,
+        paddingLeft: "10px",
+        paddingRight: "10px",
+        paddingBottom: "20px",
+      }}
+    >
       <div
         style={{
           display: "flex",
@@ -428,7 +364,7 @@ export default function TableSecurity(props) {
               transform: "translate(14px, -9px) scale(0.75)", // Adjust label position when focused
             },
             "& .MuiInputBase-input": {
-              fontSize: '0.75rem', // Adjust the font size of the input text
+              fontSize: "0.75rem", // Adjust the font size of the input text
             },
             "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
               borderColor: "currentColor", // Keeps the current border color
@@ -436,7 +372,6 @@ export default function TableSecurity(props) {
             "&:hover .MuiOutlinedInput-notchedOutline": {
               borderColor: "currentColor", // Optional: Keeps the border color on hover
             },
-            
           }}
         />
       </div>
@@ -444,25 +379,12 @@ export default function TableSecurity(props) {
         <Paper sx={{ width: "100%", mb: 2 }}>
           {/* <EnhancedTableToolbar numSelected={selected.length} /> */}
           {/* <TableContainer sx={{maxHeight:"60vh",overflow:"scroll" }}> */}
-          <TableContainer sx={{ maxHeight: "55vh", overflow: "scroll" }}>
-            <Table
-              stickyHeader
-              sx={{ minWidth: 750 }}
-              aria-labelledby="tableTitle"
-              size={dense ? "small" : "medium"}
-            >
-              {/* <EnhancedTableHead
-              numSelected={selected.length}
-              order={order}
-              orderBy={orderBy}
-              onSelectAllClick={handleSelectAllClick}
-              onRequestSort={handleRequestSort}
-              rowCount={rows.length > 0 ? totalRows : 0}
-              headCells={headCells}
-              
-            /> */}
+          <TableContainer
+            sx={{ maxHeight: "50vh", overflow: "auto", scrollbarWidth: "thin" }}
+          >
+            <Table stickyHeader sx={{ minWidth: 750 }}>
               <TableHead>
-                <TableRow>
+                <TableRow sx={{ position: "sticky", top: 0 }}>
                   {columns.map((column, index) => (
                     <TableCell
                       key={column.id}
@@ -516,7 +438,10 @@ export default function TableSecurity(props) {
                       onDoubleClick={() => props.onRowDoubleClick(row.IId)}
                       tabIndex={-1}
                       key={row.IId}
-                      sx={{ cursor: "default" }}
+                      sx={{
+                        cursor: "default",
+                        backgroundColor: isItemSelected ?"#f5f5f5" : "#f5f5f5white"
+                      }}
                       className={isEvenRow ? "FXTeven-row" : "FXTodd-row"}
                     >
                       {/* <TableCell sx={{ padding: "0px",textAlign:"center" }}>
@@ -542,7 +467,9 @@ export default function TableSecurity(props) {
                           key={column.id}
                           style={{ minWidth: column.minWidth }}
                         >
-                          {row[column.id]}
+                          {profileDateFields.includes(column.label)
+                            ? convertToLocaleDateString(row[column.id])
+                            : row[column.id]}
                         </TableCell>
                       ))}
                     </TableRow>
@@ -553,53 +480,41 @@ export default function TableSecurity(props) {
           </TableContainer>
         </Paper>
       ) : (
-        <Box sx={{ width: "100%", textAlign: "center", my: 4 }}>
-          <Typography>No Data</Typography>
-        </Box>
+        <>
+          <>
+            {loading && (
+              <Box sx={{ width: "100%", textAlign: "center", my: 4 }}>
+                <Typography>Please Wait</Typography>
+              </Box>
+            )}
+          </>
+          <>
+            {!loading && (
+              <Box sx={{ width: "100%", textAlign: "center", my: 4 }}>
+                <Typography>No Data</Typography>
+              </Box>
+            )}
+          </>
+        </>
       )}
-      <TablePagination
-        rowsPerPageOptions={[10, 25, 50, 100]}
-        component="div"
-        count={rows.length > 0 ? totalRows : 0}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-        ActionsComponent={TablePaginationActions}
-        sx={{
-          display: "flex", // Use flexbox for the container
-          justifyContent: "space-between", // Space between the elements
-          alignItems: "center", // Center the elements vertically
-          ".MuiTablePagination-toolbar": {
-            justifyContent: "space-between",
+      {filteredRows && filteredRows.length > 0 && (
+        <Pagination
+          count={rows.length > 0 ? totalPages : 0}
+          page={page + 1} // Pagination component is 1-based, but state is 0-based
+          onChange={(event, value) => handleChangePage(null, value - 1)}
+          variant="outlined"
+          shape="rounded"
+          showFirstButton
+          showLastButton
+          ActionsComponent={TablePaginationActions}
+          sx={{
+            display: "flex",
+            justifyContent: "center",
             alignItems: "center",
-            width: "100%", // Ensure the toolbar takes the full width
-          },
-          ".MuiTablePagination-spacer": {
-            flex: "1 1 100%", // Force the spacer to take up all available space
-          },
-          ".MuiTablePagination-selectLabel": {
-            margin: 0, // Adjust or remove margin as needed
-            display: "none",
-          },
-          ".MuiTablePagination-select": {
-            textAlign: "center", // Center the text inside the select input
-            display: "none",
-          },
-          ".MuiTablePagination-selectIcon": {
-            display: "none", // Adjust the position of the icon as needed
-          },
-          ".MuiTablePagination-displayedRows": {
-            textAlign: "left", // Align the "1-4 of 4" text to the left
-            flexShrink: 0, // Prevent the text from shrinking
-            order: -1, // Place it at the beginning
-          },
-          ".MuiTablePagination-actions": {
-            flexShrink: 0, // Prevent the actions from shrinking
-          },
-          // Add other styles as needed
-        }}
-      />
+            padding: "16px", // Adjust as needed for spacing
+          }}
+        />
+      )}
     </Box>
   );
 }
@@ -632,25 +547,24 @@ const TablePaginationActions = (props) => {
       )}
       {pages.map((pageNum) => (
         <IconButton
-        sx={{
-          minWidth:"30px",
-          minHeight:"30px",
-          padding: '2px',
-          margin: '1px',
-          justifyContent: 'center',
-          alignItems: 'center',
-          borderRadius: '50%', // Make the background round
-          color: 'inherit',
-          backgroundColor: pageNum === page ? 'grey' : 'white',
-          '&:hover': {
-            backgroundColor: pageNum === page ? 'grey' : 'lightgrey', // Change hover color
-          },
-          '&.Mui-disabled': {
-            backgroundColor: 'white',
-          },
-          fontSize:"14px"
-        }}
-          
+          sx={{
+            minWidth: "30px",
+            minHeight: "30px",
+            padding: "2px",
+            margin: "1px",
+            justifyContent: "center",
+            alignItems: "center",
+            borderRadius: "50%", // Make the background round
+            color: "inherit",
+            backgroundColor: pageNum === page ? "grey" : "white",
+            "&:hover": {
+              backgroundColor: pageNum === page ? "grey" : "lightgrey", // Change hover color
+            },
+            "&.Mui-disabled": {
+              backgroundColor: "white",
+            },
+            fontSize: "14px",
+          }}
           key={pageNum}
           color={pageNum === page ? "primary" : "default"}
           onClick={() => handlePageButtonClick(pageNum)}

@@ -688,7 +688,7 @@ export default function SideBar() {
   const [currentLanguage, setCurrentLanguage] = useState({direction: 'ltr',language:""})
   const [languageList, setLanguageList] = useState([]);
 
-  const { Navbar_getlanguagelist } = coreApis();
+  const { Navbar_getlanguagelist,Navbar_getmenudetails } = coreApis();
 
   useEffect(() => {
 
@@ -872,6 +872,27 @@ export default function SideBar() {
     localStorage.setItem('languageDirection', direction);
   };
   direction = localStorage.getItem('languageDirection');
+
+  
+  useEffect(() => {
+
+    const fetchData = async () => {
+     
+      try {
+        const response = await Navbar_getmenudetails({
+          languageId: 1
+        });
+        console.log(JSON.parse(response.result));
+        
+       
+        
+      } catch (error) {}
+
+    };
+    fetchData()
+   
+  }, [])
+  
   return (
     <>
       <>

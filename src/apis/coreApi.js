@@ -238,12 +238,22 @@ const Navbar_getlanguagelist = async () => {
     throw error;
   }
 };
-
+const Navbar_getmenudetails = async (payload) => {
+  try {
+    const response = await makeAuthorizedRequest("get", `/menu/getmenudetails`,payload);
+   
+    return response;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
   
   return {
    
   
-    Navbar_getlanguagelist
+    Navbar_getlanguagelist,
+    Navbar_getmenudetails
    
   };
 };

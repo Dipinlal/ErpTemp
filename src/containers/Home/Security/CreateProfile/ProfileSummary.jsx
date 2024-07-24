@@ -1,13 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { IconButton, Box, Typography, Stack } from "@mui/material";
 import {
-  
-  IconButton,
-  Box,
-  Typography,
-  Stack,
-} from "@mui/material";
-import {
-
   Edit as EditIcon,
   Delete as DeleteIcon,
   Close as CloseIcon,
@@ -16,12 +9,6 @@ import TableSecurity from "../../../../components/Tables/TableSecurity";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import Link from "@mui/material/Link";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import {
-  primaryButtonColor,
-  
-} from "../../../../config";
-
-
 import PrintIcon from "@mui/icons-material/Print";
 import HomeIcon from "@mui/icons-material/Home";
 import AddIcon from "@mui/icons-material/Add";
@@ -48,7 +35,6 @@ function BasicBreadcrumbs({ currentTheme }) {
     >
       <Stack spacing={2} sx={{ flex: 1 }}>
         <Breadcrumbs
-        
           separator={
             <NavigateNextIcon
               fontSize="small"
@@ -92,6 +78,12 @@ function BasicBreadcrumbs({ currentTheme }) {
     </div>
   );
 }
+const iconsExtraSx = {
+  fontSize: "0.8rem", padding: "0.5rem", 
+  '&:hover': {
+    backgroundColor: 'transparent'},
+   
+}
 const DefaultIcons = ({ iconsClick, currentTheme }) => {
   return (
     <Box
@@ -104,7 +96,7 @@ const DefaultIcons = ({ iconsClick, currentTheme }) => {
     >
       <IconButton
         aria-label="New"
-        sx={{ fontSize: "0.8rem", padding: "0.5rem" }}
+        sx={iconsExtraSx}
         onClick={() => iconsClick("new")}
       >
         <Stack direction="column" alignItems="center">
@@ -120,7 +112,7 @@ const DefaultIcons = ({ iconsClick, currentTheme }) => {
       </IconButton>
       <IconButton
         aria-label="New"
-        sx={{ fontSize: "0.8rem", padding: "0.5rem" }}
+        sx={iconsExtraSx}
         onClick={() => iconsClick("edit")}
       >
         <Stack direction="column" alignItems="center">
@@ -134,10 +126,10 @@ const DefaultIcons = ({ iconsClick, currentTheme }) => {
           </Typography>
         </Stack>
       </IconButton>
-      
+
       <IconButton
         aria-label="Clone"
-        sx={{ fontSize: "0.8rem", padding: "0.5rem" }}
+        sx={iconsExtraSx}
       >
         <Stack direction="column" alignItems="center">
           <PrintIcon sx={{ color: currentTheme.actionIcons }} />
@@ -152,7 +144,7 @@ const DefaultIcons = ({ iconsClick, currentTheme }) => {
       </IconButton>
       <IconButton
         aria-label="New"
-        sx={{ fontSize: "0.8rem", padding: "0.5rem" }}
+        sx={iconsExtraSx}
         onClick={() => iconsClick("delete")}
       >
         <Stack direction="column" alignItems="center">
@@ -168,7 +160,7 @@ const DefaultIcons = ({ iconsClick, currentTheme }) => {
       </IconButton>
       <IconButton
         aria-label="New"
-        sx={{ fontSize: "0.8rem", padding: "0.5rem" }}
+        sx={iconsExtraSx}
         onClick={() => iconsClick("close")}
       >
         <Stack direction="column" alignItems="center">
@@ -182,28 +174,31 @@ const DefaultIcons = ({ iconsClick, currentTheme }) => {
           </Typography>
         </Stack>
       </IconButton>
-      {/* <Example/> */}
+      
     </Box>
   );
 };
 
-
 const ProfileSummary = ({ setPage, setdetailPageId }) => {
-  const [rows, setRows] = React.useState([]);
-  const [displayLength, setdisplayLength] = React.useState(10);
-  const [pageNumber, setpageNumber] = React.useState(1);
-  const [changesTriggered, setchangesTriggered] = React.useState(false);
-  const [selectedDatas, setselectedDatas] = React.useState([]);
-  const [totalRows, settotalRows] = useState(10);
-  const [refreshFlag, setrefreshFlag] = React.useState(true);
-  const [searchKey, setsearchKey] = useState("");
-  const [loader, setLoader] = useState(false);
-
+  const [rows, setRows] = React.useState([]);//To Pass in Table
+  const [displayLength, setdisplayLength] = React.useState(10);// Show Entries
+  const [pageNumber, setpageNumber] = React.useState(1);//Table current page number
+  const [changesTriggered, setchangesTriggered] = React.useState(false);//Any changes made like delete, add new profile then makes it true for refreshing the table
+  const [selectedDatas, setselectedDatas] = React.useState([]);//selected rows details
+  const [totalRows, settotalRows] = useState(null);// Total rows of Api response
+  const [refreshFlag, setrefreshFlag] = React.useState(true);//To take data from Data base
+  const [searchKey, setsearchKey] = useState("");//Table Searching
+  const [loader, setLoader] = useState(false);//To show loader while api calling
+  const [totalPages, setTotalPages] = useState(null);
+  //profile page Apis
   const { getProfileSummary } = profileApis();
 
+  //Current theme 
   const { currentTheme } = useTheme();
 
-  const fetchData = async () => {
+
+  //Profile Summary 
+  const fetchProfileSummary = async () => {
     handleOpen();
     setselectedDatas([]);
     loaderOpen();
@@ -218,26 +213,30 @@ const ProfileSummary = ({ setPage, setdetailPageId }) => {
       setrefreshFlag(false);
       if (response?.status === "Success") {
         const myObject = JSON.parse(response?.result);
-        console.log(myObject, myObject?.PageSummary[0].TotalRows, "myObject");
+      
 
         // Assuming Item1 contains the data for your table
         setRows(myObject?.Data);
 
         // Extract the number of total rows from Item2
         const totalRows = myObject?.PageSummary[0].TotalRows;
+        const totalPages = myObject?.PageSummary[0].TotalPages;
 
         // Set total rows to your state or wherever it needs to be used
         settotalRows(totalRows);
+        setTotalPages(totalPages)
       }
+      loaderClose();
     } catch (error) {}
+    loaderClose();
   };
 
   React.useEffect(() => {
-    fetchData(); // Initial data fetch
+    fetchProfileSummary(); // Initial data fetch
   }, [pageNumber, displayLength, searchKey]);
 
   const handleRowDoubleClick = (rowiId) => {
-    console.log(rowiId);
+ 
     // if (rowiId === null) {
     //   setAlertMessage("Please Select Row");
     //   setShowAlert(true);
@@ -331,7 +330,8 @@ const ProfileSummary = ({ setPage, setdetailPageId }) => {
           currentTheme={currentTheme}
         />
       </Box>
-      <Box sx={{ width: "100%", overflowX: "auto" }}>
+      <Box sx={{ width: "100%", overflowX: "auto", paddingBottom: "10px" }}>
+        <Loader loader={loader} loaderClose={loaderClose} />
         <TableSecurity
           rows={rows}
           //onExportData={handleExportData}
@@ -345,9 +345,10 @@ const ProfileSummary = ({ setPage, setdetailPageId }) => {
           onRowDoubleClick={handleRowDoubleClick}
           totalRows={totalRows}
           currentTheme={currentTheme}
+          loading={loader}
+          totalPages={totalPages}
         />
       </Box>
-      <Loader loader={loader} loaderClose={loaderClose} />
     </Box>
   );
 };
